@@ -125,7 +125,7 @@
                 control={control}
                 rules={{ required: "Category is required" }}
                 render={({ field }) => (
-                <Select {...field}>
+                <Select {...field} label="Category">
                     <MenuItem value="Personal">Personal</MenuItem>
                     <MenuItem value="Professional">Professional</MenuItem>
                 </Select>
@@ -143,7 +143,7 @@
                 control={control}
                 rules={{ required: "This field is required" }}
                 render={({ field }) => (
-                    <Select {...field}>
+                    <Select {...field} label="Sub Category" >
                     {(category === "Personal" ? personalNames : professionalDepartments).map((option) => (
                         <MenuItem key={option} value={option}>
                         {option}
@@ -166,7 +166,7 @@
                 onChange={(e) => setNewTag(e.target.value)}
                 sx={{ flexGrow: 1, marginRight: "10px" }}
             />
-            <Button variant="contained" onClick={handleAddTag}>
+            <Button variant="contained" onClick={handleAddTag} sx={{bgcolor:"#000"}}>
                 Add
             </Button>
             </Box>
@@ -198,7 +198,7 @@
                 id="fileInput"
             />
             <label htmlFor="fileInput" style={{ cursor: "pointer" }}>
-                <Typography variant="body1" color="primary">
+                <Typography variant="body1" color="#000">
                 Click to Upload Image or PDF
                 </Typography>
             </label>
@@ -248,8 +248,8 @@
             {errors.remarks && <Typography color="error">{errors.remarks.message}</Typography>}
 
             {/* Submit Button */}
-            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit(onSubmit)}>
-            Upload File
+            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit(onSubmit)} sx={{bgcolor:"#000"}}>
+            Submit
             </Button>
         </Card>
         </Container>
