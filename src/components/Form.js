@@ -22,6 +22,7 @@ const FileUploadComponent = () => {
     handleSubmit,
     setValue,
     watch,
+    reset,
     register,
     formState: { errors },
   } = useForm({
@@ -105,6 +106,7 @@ const FileUploadComponent = () => {
         console.log("File uploaded successfully:", response.data);
         toast.success(response.data?.message);
         setLoading(false);
+        reset()
       }
     } catch (error) {
       console.error("Upload failed:", error);
