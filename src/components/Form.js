@@ -4,7 +4,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
-import { Close } from "@mui/icons-material";
 import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
 
 const FileUploadComponent = () => {
@@ -30,8 +29,6 @@ const FileUploadComponent = () => {
   });
 
   const category = watch("category");
-  const categories = ["Personal", "Professional"];
-
   const personalNames = ["John", "Tom", "Emily", "Sara"];
   const professionalDepartments = ["Accounts", "HR", "IT", "Finance"];
 
