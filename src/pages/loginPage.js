@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Card, Form, Button } from "react-bootstrap";
-
+import toast, { Toaster } from "react-hot-toast";
+import { generateOTP, validateOTP } from "../Apis/API";
 
 const LoginPage = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -18,32 +19,41 @@ const LoginPage = () => {
   } = useForm();
 
   // Function to send OTP
-  const sendOtp = (data) => {
+  const sendOtp = async (data) => {
     console.log("Mobile Number Submitted:", data.mobile);
     setIsOtpSent(true); // Simulate OTP sent
 
-    // try {
-    //   const response = await axios.post("{{base_url_documents}}/generateOTP", { mobile_number: data.mobile });
-    //   if (response.status === 200) setIsOtpSent(true);
-    // } catch (error) {
-    //   console.error("Error sending OTP:", error);
-    // }
+    try {
+      const response = await generateOTP(data.mobile);
+      console.log("response", response?.data?.status);
+
+      if (response?.data?.status) {
+        console.log("response", response);
+        toast.success("OTP Send Successfully!!");
+
+        setIsOtpSent(true);
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+    }
   };
 
   // Function to validate OTP
-  const validateOtp = (data) => {
+  const validateOtp = async (data) => {
     console.log("OTP Submitted:", data.otp);
-    navigate("/dashboard"); // Simulate successful login
+    // Simulate successful login
 
-    // try {
-    //   const response = await axios.post("{{base_url_documents}}/validateOTP", { mobile_number: data.mobile, otp: data.otp });
-    //   if (response.status === 200) {
-    //     localStorage.setItem("token", response.data.token);
-    //     navigate("/dashboard");
-    //   }
-    // } catch (error) {
-    //   console.error("Error validating OTP:", error);
-    // }
+    try {
+      const response = await validateOTP(data.mobile, data.otp);
+      if (response?.data?.status) {
+        console.log("response", response);
+        localStorage.setItem("token", response?.data?.data.token);
+        toast.success(" OTP Verify Successfully!!");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error validating OTP:", error);
+    }
   };
 
   return (
@@ -77,10 +87,11 @@ const LoginPage = () => {
               {errors.mobile?.message}
             </Form.Control.Feedback>
           </Form.Group>
-
-          <Button type="submit" variant="primary" className="w-100">
-            Send OTP
-          </Button>
+          {!isOtpSent && (
+            <Button type="submit" variant="primary" className="w-100">
+              Send OTP
+            </Button>
+          )}
         </Form>
 
         {isOtpSent && (

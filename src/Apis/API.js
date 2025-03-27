@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const BASE_URL = process.env.API_URL
+const BASE_URL = 'https://apis.allsoft.co/api/documentManagement'
 console.log('BASE_URL', BASE_URL)
 // Generate OTP
 export const generateOTP = async (mobile_number) => {
