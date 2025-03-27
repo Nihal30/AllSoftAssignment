@@ -1,34 +1,77 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import LOGO from "../assets/logo.jpeg";
-import { Navbar, Container, Form, Button, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Navbar,
+  Badge,
+} from "react-bootstrap";
+import { searchDocuments } from "../Apis/API";
+import toast from "react-hot-toast";
 
-const categories = ["Personal", "Professional"];
-const predefinedTags = ["Invoice", "Report", "Contract", "Receipt"];
+const FileSearch = ({setResults}) => {
+  const { control, handleSubmit, setValue } = useForm();
+  const [tags, setTags] = useState([]); // Store multiple tags
+  const [newTag, setNewTag] = useState(""); // Store current input tag
+  const [loading, setLoading] = useState(false);
 
-const FileSearch = ({ onSearch }) => {
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  // Add a new tag
+  const handleAddTag = () => {
+    if (newTag.trim() !== "") {
+      setTags([...tags, { tag_name: newTag.trim() }]); // Add new tag object
+      setNewTag(""); // Reset input
+    }
+  };
 
-  const onSubmit = (data) => {
-    console.log("Search Criteria:", data);
+  // Remove a tag
+  const handleRemoveTag = (index) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+  const token = localStorage.getItem("token");
+  // Form submit handler
+  const onSubmit = async (data) => {
+    const payload = {
+      major_head: data.category || "", // Category
+      minor_head: "", // Not needed
+      from_date: data.fromDate || "", // From Date
+      to_date: data.toDate || "", // To Date
+      tags: tags, // Tags in correct format
+      uploaded_by: "",
+      start: 0,
+      length: 10,
+      filterId: "",
+      search: { value: data.search || "" }, // Search input added
+    };
+
+    console.log("Search Payload:", payload);
+
+    try {
+      setLoading(true);
+      const response = await searchDocuments(payload, token);
+      if (response?.data?.status) {
+        console.log("Get Search Result successfully", response.data);
+        setResults(response.data?.data)
+        toast.success("Get Search Result successfully");
+      }
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Navbar bg="success" variant="dark" expand="lg" className="p-3">
       <Container className="d-flex justify-content-between align-items-center">
-        {/* Logo */}
-        <div>
-          <img src={LOGO} alt="LOGO" style={{ width: 120, borderRadius: 120 }} />
-        </div>
-
-        {/* Form */}
-        <Form onSubmit={handleSubmit(onSubmit)} className="w-100" style={{ maxWidth: "600px" }}>
-          {/* Dropdowns Row */}
+        <Form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-100"
+          style={{ maxWidth: "700px" }}
+        >
+          {/* Category & Search Input Row */}
           <Row className="mb-2">
             <Col md={6}>
               <Form.Group>
@@ -36,33 +79,28 @@ const FileSearch = ({ onSearch }) => {
                 <Controller
                   name="category"
                   control={control}
-                  rules={{ required: "Category is required" }}
                   render={({ field }) => (
-                    <Form.Select {...field} isInvalid={!!errors.category}>
+                    <Form.Select {...field}>
                       <option value="">Select Category</option>
-                      {categories.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
+                      <option value="Personal">Personal</option>
+                      <option value="Professional">Professional</option>
                     </Form.Select>
                   )}
                 />
-                <Form.Control.Feedback type="invalid">{errors.category?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
+
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Tags</Form.Label>
+                <Form.Label>Search</Form.Label>
                 <Controller
-                  name="tags"
+                  name="search"
                   control={control}
                   render={({ field }) => (
                     <Form.Control
                       {...field}
                       type="text"
-                      placeholder="Enter tags"
-                      onChange={(e) => setValue("tags", e.target.value.split(","))}
+                      placeholder="Enter search term"
                     />
                   )}
                 />
@@ -70,8 +108,44 @@ const FileSearch = ({ onSearch }) => {
             </Col>
           </Row>
 
-          {/* Date Pickers Row */}
-          <Row className="mb-2" >
+          {/* Multiple Tag Input */}
+          <Row className="mb-3">
+            <Col xs={8}>
+              <Form.Control
+                type="text"
+                placeholder="Add Tag"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+              />
+            </Col>
+            <Col xs={4}>
+              <Button variant="dark" onClick={handleAddTag} className="w-100">
+                Add
+              </Button>
+            </Col>
+          </Row>
+
+          {/* Display Added Tags */}
+          <Row className="mb-2">
+            <Col>
+              {tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  pill
+                  bg="light"
+                  text="dark"
+                  className="me-2 p-2"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleRemoveTag(index)}
+                >
+                  {tag.tag_name} ❌
+                </Badge>
+              ))}
+            </Col>
+          </Row>
+
+          {/* Date Pickers */}
+          <Row className="mb-2">
             <Col md={6}>
               <Form.Group>
                 <Form.Label>From Date</Form.Label>
@@ -79,7 +153,7 @@ const FileSearch = ({ onSearch }) => {
                   name="fromDate"
                   control={control}
                   render={({ field }) => (
-                    <Form.Control {...field} type="date" onChange={(e) => setValue("fromDate", e.target.value)} />
+                    <Form.Control {...field} type="date" />
                   )}
                 />
               </Form.Group>
@@ -91,7 +165,7 @@ const FileSearch = ({ onSearch }) => {
                   name="toDate"
                   control={control}
                   render={({ field }) => (
-                    <Form.Control {...field} type="date" onChange={(e) => setValue("toDate", e.target.value)} />
+                    <Form.Control {...field} type="date" />
                   )}
                 />
               </Form.Group>
@@ -99,8 +173,13 @@ const FileSearch = ({ onSearch }) => {
           </Row>
 
           {/* Search Button */}
-          <Button type="submit" variant="dark" className="w-100">
-            Search
+          <Button
+            type="submit"
+            variant="dark"
+            className="w-100"
+            disabled={loading}
+          >
+            {loading ? "Searching..." : "Search"}
           </Button>
         </Form>
       </Container>

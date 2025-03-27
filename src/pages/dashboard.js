@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import Form from "../components/Form";
 import FileResults from "../components/FileResults";
@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [results,setResults]=useState(null)
+  console.log('results', results)
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // Check token in localStorage
@@ -17,9 +19,9 @@ const Dashboard = () => {
 
   return (
     <div>
-      <NavBar />
+      <NavBar  setResults={setResults}/>
       <Form />
-      <FileResults />
+      <FileResults  results={results}/>
     </div>
   );
 };
