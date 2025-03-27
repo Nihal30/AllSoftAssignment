@@ -8,6 +8,7 @@ import { generateOTP, validateOTP } from "../Apis/API";
 
 const LoginPage = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // React Hook Form setup
@@ -22,6 +23,7 @@ const LoginPage = () => {
   const sendOtp = async (data) => {
     console.log("Mobile Number Submitted:", data.mobile);
     setIsOtpSent(true); // Simulate OTP sent
+    setLoading(true);
 
     try {
       const response = await generateOTP(data.mobile);
@@ -32,9 +34,11 @@ const LoginPage = () => {
         toast.success("OTP Send Successfully!!");
 
         setIsOtpSent(true);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
+      setLoading(false);
     }
   };
 
@@ -42,6 +46,7 @@ const LoginPage = () => {
   const validateOtp = async (data) => {
     console.log("OTP Submitted:", data.otp);
     // Simulate successful login
+    setLoading(true);
 
     try {
       const response = await validateOTP(data.mobile, data.otp);
@@ -49,10 +54,12 @@ const LoginPage = () => {
         console.log("response", response);
         localStorage.setItem("token", response?.data?.data.token);
         toast.success(" OTP Verify Successfully!!");
+        setLoading(false);
         navigate("/dashboard");
       }
     } catch (error) {
       console.error("Error validating OTP:", error);
+      setLoading(false);
     }
   };
 
@@ -88,8 +95,13 @@ const LoginPage = () => {
             </Form.Control.Feedback>
           </Form.Group>
           {!isOtpSent && (
-            <Button type="submit" variant="primary" className="w-100">
-              Send OTP
+            <Button
+              type="submit"
+              variant="dark"
+              className="w-100"
+              disabled={loading}
+            >
+              {loading ? "Sending OTP..." : " Send OTP"}
             </Button>
           )}
         </Form>
@@ -116,8 +128,13 @@ const LoginPage = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            <Button type="submit" variant="success" className="w-100">
-              Verify OTP
+            <Button
+              type="submit"
+              variant="success"
+              className="w-100"
+              disabled={loading}
+            >
+              {loading ? "Verifying..." : " Verify OTP"}
             </Button>
           </Form>
         )}

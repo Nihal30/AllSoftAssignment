@@ -7,12 +7,15 @@ import dayjs from "dayjs";
 import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
 import { uploadFile } from "../Apis/API";
 import toast, { Toaster } from "react-hot-toast";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 const FileUploadComponent = () => {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [file, setFile] = useState(null);
+  console.log("file", file);
   const [preview, setPreview] = useState("");
+  console.log("preview", preview);
 
   const {
     control,
@@ -236,13 +239,45 @@ const FileUploadComponent = () => {
         </Form.Group>
 
         {/* Image Preview */}
-        {preview && (
+        {/* {preview && (
           <div className="position-relative mb-3">
             <img
               src={preview}
               alt="Preview"
               style={{ width: "100%", maxHeight: "200px", borderRadius: "8px" }}
             />
+            <button
+              className="btn btn-danger btn-sm position-absolute top-0 end-0"
+              onClick={() => {
+                setFile(null);
+                setPreview("");
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )} */}
+
+        {/* File Preview */}
+        {file && (
+          <div className="position-relative mb-3">
+            {file.type === "application/pdf" ? (
+              <div className="d-flex align-items-center gap-2">
+                <PictureAsPdfIcon sx={{ fontSize: 60, color: "red" }} />
+
+                <span>{file.name}</span>
+              </div>
+            ) : (
+              <img
+                src={preview}
+                alt="Preview"
+                style={{
+                  width: "100%",
+                  maxHeight: "200px",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
             <button
               className="btn btn-danger btn-sm position-absolute top-0 end-0"
               onClick={() => {
