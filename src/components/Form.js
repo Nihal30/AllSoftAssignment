@@ -34,6 +34,7 @@ const FileUploadComponent = () => {
   const personalNames = ["John", "Tom", "Emily", "Sara"];
   const professionalDepartments = ["Accounts", "HR", "IT", "Finance"];
   const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(false);
 
   // Handle File Upload
   const handleFileChange = (event) => {
@@ -79,7 +80,7 @@ const FileUploadComponent = () => {
       alert("Please upload a file (Image/PDF)");
       return;
     }
-
+    setLoading(true);
     // Construct the payload
     const payload = {
       major_head: data.category === "Personal" ? "Personal" : "Company",
@@ -100,9 +101,13 @@ const FileUploadComponent = () => {
       if (response?.data?.status) {
         console.log("File uploaded successfully:", response.data);
         toast.success(response.data?.message);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Upload failed:", error);
+      toast.error("Upload failed");
+
+      setLoading(false);
     }
   };
 
@@ -267,9 +272,10 @@ const FileUploadComponent = () => {
         <Button
           variant="dark"
           className="w-100"
+          disabled={loading}
           onClick={handleSubmit(onSubmit)}
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </Button>
       </Card>
     </Container>
