@@ -5,6 +5,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
+import { uploadFile } from "../Apis/API";
+import toast, { Toaster } from "react-hot-toast";
 
 const FileUploadComponent = () => {
   const [tags, setTags] = useState([]);
@@ -31,6 +33,7 @@ const FileUploadComponent = () => {
   const category = watch("category");
   const personalNames = ["John", "Tom", "Emily", "Sara"];
   const professionalDepartments = ["Accounts", "HR", "IT", "Finance"];
+  const token = localStorage.getItem("token");
 
   // Handle File Upload
   const handleFileChange = (event) => {
@@ -71,12 +74,36 @@ const FileUploadComponent = () => {
   };
 
   // Handle Form Submit
-  const onSubmit = (data) => {
-    console.log("Form Data:", {
-      ...data,
-      tags,
-      file: file ? file.name : "No file selected",
-    });
+  const onSubmit = async (data) => {
+    if (!file) {
+      alert("Please upload a file (Image/PDF)");
+      return;
+    }
+
+    // Construct the payload
+    const payload = {
+      major_head: data.category === "Personal" ? "Personal" : "Company",
+      minor_head: data.subCategory,
+      document_date: dayjs(data.date).format("DD-MM-YYYY"),
+      document_remarks: data.remarks,
+      tags: tags.map((tag) => ({ tag_name: tag })),
+      user_id: "nitin",
+    };
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("data", JSON.stringify(payload));
+
+    try {
+      const response = await uploadFile(formData, token);
+      if (response?.data?.status) {
+        console.log("File uploaded successfully:", response.data);
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
   };
 
   return (
