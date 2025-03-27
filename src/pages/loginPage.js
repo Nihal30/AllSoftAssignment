@@ -32,9 +32,8 @@ const LoginPage = () => {
       if (response?.data?.status) {
         console.log("response", response);
         toast.success("OTP Send Successfully!!");
-
-        setIsOtpSent(true);
         setLoading(false);
+        setIsOtpSent(true);
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
