@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Button, Card, Container, TextField, Typography } from "@mui/material";
+import { Container, Card, Form, Button } from "react-bootstrap";
+
 
 const LoginPage = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -46,52 +47,68 @@ const LoginPage = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginTop: "50px", display: "flex", justifyContent: "center" }}>
-      <Card style={{ padding: "20px", width: "100%", maxWidth: "400px", textAlign: "center" }}>
-        <Typography variant="h5" gutterBottom>
-          Login with OTP
-        </Typography>
+    <Container
+      className="d-flex justify-content-center"
+      style={{ marginTop: "50px" }}
+    >
+      <Card
+        className="p-4 text-center"
+        style={{ width: "100%", maxWidth: "400px" }}
+      >
+        <h5 className="mb-3">Login with OTP</h5>
 
-        <form onSubmit={handleSubmit(sendOtp)}>
+        <Form onSubmit={handleSubmit(sendOtp)}>
           {/* Mobile Number Input */}
-          <TextField
-            fullWidth
-            label="Mobile Number"
-            variant="outlined"
-            margin="normal"
-            {...register("mobile", {
-              required: "Mobile number is required",
-              pattern: { value: /^[6-9]\d{9}$/, message: "Enter a valid 10-digit mobile number" },
-            })}
-            error={!!errors.mobile}
-            helperText={errors.mobile?.message}
-          />
+          <Form.Group className="mb-3">
+            <Form.Label>Mobile Number</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter mobile number"
+              {...register("mobile", {
+                required: "Mobile number is required",
+                // pattern: {
+                //   value: /^[6-9]\d{9}$/,
+                //   message: "Enter a valid 10-digit mobile number",
+                // },
+              })}
+              isInvalid={!!errors.mobile}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.mobile?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+          <Button type="submit" variant="primary" className="w-100">
             Send OTP
           </Button>
-        </form>
+        </Form>
 
         {isOtpSent && (
-          <form onSubmit={handleSubmit(validateOtp)}>
+          <Form onSubmit={handleSubmit(validateOtp)} className="mt-3">
             {/* OTP Input */}
-            <TextField
-              fullWidth
-              label="Enter OTP"
-              variant="outlined"
-              margin="normal"
-              {...register("otp", {
-                required: "OTP is required",
-                pattern: { value: /^\d{6}$/, message: "Enter a valid 6-digit OTP" },
-              })}
-              error={!!errors.otp}
-              helperText={errors.otp?.message}
-            />
+            <Form.Group className="mb-3">
+              <Form.Label>Enter OTP</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter OTP"
+                {...register("otp", {
+                  required: "OTP is required",
+                  pattern: {
+                    value: /^\d{6}$/,
+                    message: "Enter a valid 6-digit OTP",
+                  },
+                })}
+                isInvalid={!!errors.otp}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.otp?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-            <Button type="submit" variant="contained" color="success" fullWidth>
+            <Button type="submit" variant="success" className="w-100">
               Verify OTP
             </Button>
-          </form>
+          </Form>
         )}
       </Card>
     </Container>
