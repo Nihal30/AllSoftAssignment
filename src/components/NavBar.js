@@ -11,8 +11,9 @@ import {
 } from "react-bootstrap";
 import { searchDocuments } from "../Apis/API";
 import toast from "react-hot-toast";
+import LOGO from "../assets/logo.jpeg";
 
-const FileSearch = ({setResults}) => {
+const FileSearch = ({ setResults }) => {
   const { control, handleSubmit, setValue } = useForm();
   const [tags, setTags] = useState([]); // Store multiple tags
   const [newTag, setNewTag] = useState(""); // Store current input tag
@@ -53,7 +54,7 @@ const FileSearch = ({setResults}) => {
       const response = await searchDocuments(payload, token);
       if (response?.data?.status) {
         console.log("Get Search Result successfully", response.data);
-        setResults(response.data?.data)
+        setResults(response.data?.data);
         toast.success("Get Search Result successfully");
       }
     } catch (error) {
@@ -66,11 +67,12 @@ const FileSearch = ({setResults}) => {
   return (
     <Navbar bg="success" variant="dark" expand="lg" className="p-3">
       <Container className="d-flex justify-content-between align-items-center">
-        <Form
-          onSubmit={handleSubmit(onSubmit)}
-          className="w-100"
-          style={{ maxWidth: "700px" }}
-        >
+        {/* Left Side Icon */}
+        {/* <BiMenu size={30} color="white" /> */}
+        <img src={LOGO} alt="LOGO" style={{borderRadius:'50%'}}/>
+
+        {/* Right Side Form */}
+        <Form onSubmit={handleSubmit(onSubmit)}>
           {/* Category & Search Input Row */}
           <Row className="mb-2">
             <Col md={6}>
